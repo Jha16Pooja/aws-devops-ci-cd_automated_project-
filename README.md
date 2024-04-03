@@ -40,24 +40,28 @@ ssh-copy-id ec2-user@<Node_Private_IP>  # Enter 'yes' and then ec2-user's passwo
 
 
 
-Jenkins Configuration
+# Jenkins Configuration
 1. Add Credentials in Jenkins
 Dockerhub credentials (username & password).
 Kubernetes (K8s) server username with private key.
 GitHub username & token.
 Dockerhub token (optional).
-2. Install Required Plugins
+
+# 2. Install Required Plugins
 Install the 'ssh agent' plugin in Jenkins for SSH connection management.
 
-3. Configure CI/CD Pipelines
+# 3. Configure CI/CD Pipelines
 CI-pipeline: Set up and run the Continuous Integration pipeline.
 CD-pipeline: Set up and run the Continuous Deployment pipeline.
-Pipeline Execution
+
+# Pipeline Execution
 Access the deployed application via http://<Node_Server_Public_IP>:<NodePort_No>.
-Automation
+
+# Automation
 Automate the CD pipeline to run after the CI pipeline is successful.
 Set up GitHub webhooks to trigger the CI pipeline on code changes.
-Cleanup
+
+# Cleanup
 To destroy the entire infrastructure created by Terraform, use the following command:
 
 bash
