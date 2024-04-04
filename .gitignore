@@ -1,0 +1,8 @@
+.terraform/
+.terraform.lock.hcl
+devops.pem
+# Ignore Terraform state files
+*.tfstate
+*.tfstate.*
+.DS_Store
+.terraform

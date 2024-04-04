@@ -1,0 +1,139 @@
+// JENKINS CI PIPELINE/
+// Purpose: The Code will be built into executable file (.jar) & pushed to Dockerhub
+
+
+pipeline {
+    agent any
+    environment { 
+        
+        DOCKER_USERNAME = "pooja267"
+        
+    }
+    
+
+    stages {
+        stage('1.Clean') {
+            steps { // Clean workspace directory for the current build
+                deleteDir ()
+            }
+        }
+        
+        stage('2. Git Checkout') {
+            steps {
+                dir("DevOpsProject"){
+              script {
+                   git branch: 'main', url: 'https://github.com/Jha16Pooja/aws-devops-ci-cd_automated_project-.git'
+              }
+            }
+                
+            }
+        }
+        
+        stage('3. compile') {
+            steps {
+                dir("DevOpsProject"){
+                   script{
+                       sh 'mvn compile'
+                   } 
+                    
+                }
+            }
+        }
+        
+        stage('4.Maven Unit Test') {
+            steps {
+               dir("DevOpsProject"){
+                   script{
+                       sh 'mvn test'
+                   }
+               }
+            }
+        }
+        
+        stage('5. Maven Build') {
+            // Build the application into an executable file (.jar)
+            steps{
+                dir ("DevOpsProject"){
+                  sh 'mvn clean install'   
+                }
+            }
+        }
+        
+        
+        
+        stage('6.Maven Integration Test') {
+            steps {
+                dir("DevOpsProject"){
+                    script{
+                       sh 'mvn verify'   
+                    }
+                }
+            }
+        }
+        
+        
+        stage('7.Docker Image Build') {
+            steps {
+               dir("DevOpsProject"){
+                   script{
+                      
+                       def JOB = env.JOB_NAME.toLowerCase() // Convert Jenkins Job name to lower-case
+                       sh 'docker -t build ${JOB}:${BUILD_NUMBER} . '  // 'JOB_NAME' & 'BUILD_NUMBER' are Jenkins Global variable
+                   }
+               }
+            }
+        }
+        
+        stage('8.Docker Image Tag') {
+            steps {
+               dir("DevOpsProject"){
+                   script{
+                        def JOB = env.JOB_NAME.toLowerCase() // Convert Jenkins Job name to lower-case
+                         sh "docker tag ${JOB}:${BUILD_NUMBER} ${DOCKER_USERNAME}/${JOB}:v${BUILD_NUMBER}"
+                    sh "docker tag ${JOB}:${BUILD_NUMBER} ${DOCKER_USERNAME}/${JOB}:latest"
+                   }
+               }
+            }
+        }
+        
+        stage('9. Trivy Image Scan') {
+            // Scan Docker images for vulnerabilities 
+            steps {
+               dir("DevOpsProject")
+               {
+                   script{
+                       def JOB = env.JOB_NAME.toLowerCase() // Convert Jenkins Job name to lower-case
+                  sh "trivy image ${DOCKER_USERNAME}/${JOB}:v${BUILD_NUMBER} > scan.txt"
+                   }
+               }
+            }
+        }
+        
+        stage('10 .Docker Image Push') {
+            steps {
+                dir("DevOpsProject")
+                {
+                    script{
+                        withCredentials([usernamePassword(credentialsId: 'my_dockerhub_creds', passwordVariable: 'my_docker_pass', usernameVariable: 'my_docker_user')]) {
+                       sh "docker login -u '${my_docker_user}' -p '${my_docker_pass}'"
+                    def JOB = env.JOB_NAME.toLowerCase() // Convert Jenkins Job name to lower-case
+                    sh "docker push ${DOCKER_USERNAME}/${JOB}:v${BUILD_NUMBER}"
+                    sh "docker push ${DOCKER_USERNAME}/${JOB}:latest"
+                     }
+                    }
+                }
+            }
+        }
+        
+        stage('11.Docker Image Cleanup') {
+            // Remove the unwanted (dangling) images created in Jenkins Server to free-up space
+            steps{
+                script { 
+                  sh "docker image prune -af"
+                }
+            }
+        }
+        
+        
+    }
+}
