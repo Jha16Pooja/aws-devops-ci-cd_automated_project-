@@ -29,18 +29,9 @@ pipeline {
             }
         }
         
-        stage('3. compile') {
-            steps {
-                dir("DevOpsProject"){
-                   script{
-                       sh 'mvn compile'
-                   } 
-                    
-                }
-            }
-        }
+      
         
-        stage('4.Maven Unit Test') {
+        stage('3.Maven Unit Test') {
             steps {
                dir("DevOpsProject"){
                    script{
@@ -50,7 +41,7 @@ pipeline {
             }
         }
         
-        stage('5. Maven Build') {
+        stage('4. Maven Build') {
             // Build the application into an executable file (.jar)
             steps{
                 dir ("DevOpsProject"){
@@ -61,7 +52,7 @@ pipeline {
         
         
         
-        stage('6.Maven Integration Test') {
+        stage('5.Maven Integration Test') {
             steps {
                 dir("DevOpsProject"){
                     script{
@@ -72,7 +63,7 @@ pipeline {
         }
         
         
-        stage('7.Docker Image Build') {
+        stage('6.Docker Image Build') {
             steps {
                dir("DevOpsProject"){
                    script{
@@ -84,7 +75,7 @@ pipeline {
             }
         }
         
-        stage('8.Docker Image Tag') {
+        stage('7.Docker Image Tag') {
             steps {
                dir("DevOpsProject"){
                    script{
@@ -96,7 +87,7 @@ pipeline {
             }
         }
         
-        stage('9. Trivy Image Scan') {
+        stage('8. Trivy Image Scan') {
             // Scan Docker images for vulnerabilities 
             steps {
                dir("DevOpsProject")
@@ -109,7 +100,7 @@ pipeline {
             }
         }
         
-        stage('10 .Docker Image Push') {
+        stage('9.Docker Image Push') {
             steps {
                 dir("DevOpsProject")
                 {
@@ -125,7 +116,7 @@ pipeline {
             }
         }
         
-        stage('11.Docker Image Cleanup') {
+        stage('10.Docker Image Cleanup') {
             // Remove the unwanted (dangling) images created in Jenkins Server to free-up space
             steps{
                 script { 
