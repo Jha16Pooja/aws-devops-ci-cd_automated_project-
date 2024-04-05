@@ -17,7 +17,7 @@ resource "aws_instance" "my_ec2_instance1" {
     volume_type = var.volume_type # General Purpose SSD
   }
 
-  user_data = file("${path.module}/maven.sh")
+  #user_data = file("${path.module}/maven.sh")
 
  # USING REMOTE-EXEC PROVISIONER TO INSTALL TOOLS
   provisioner "remote-exec" {
