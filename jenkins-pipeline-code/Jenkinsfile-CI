@@ -69,7 +69,7 @@ pipeline {
                    script{
                       
                        def JOB = env.JOB_NAME.toLowerCase() // Convert Jenkins Job name to lower-case
-                       sh 'docker -t build ${JOB}:${BUILD_NUMBER} . '  // 'JOB_NAME' & 'BUILD_NUMBER' are Jenkins Global variable
+                       sh "docker build -t ${JOB}:${BUILD_NUMBER} ."  // 'JOB_NAME' & 'BUILD_NUMBER' are Jenkins Global variable
                    }
                }
             }

@@ -11,7 +11,10 @@ sleep 200
 sudo yum update -y
 
 # Install Git
-sudo yum install git -y
+#sudo yum install git -y
+# Install Git, Maven, and Java Development Kit
+sudo yum install git -y 
+sudo yum install maven -y
 
 # Import Jenkins GPG key and install Jenkins
 sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
