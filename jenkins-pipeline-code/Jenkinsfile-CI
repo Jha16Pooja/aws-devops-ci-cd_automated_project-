@@ -20,11 +20,11 @@ pipeline {
         
         stage('2. Git Checkout') {
             steps {
-                dir("DevOpsProject"){
+               
               script {
                    git branch: 'main', url: 'https://github.com/Jha16Pooja/aws-devops-ci-cd_automated_project-.git'
               }
-            }
+            
                 
             }
         }
@@ -33,10 +33,10 @@ pipeline {
         
         stage('3.Maven Unit Test') {
             steps {
-               dir("DevOpsProject"){
+               
                    script{
                        sh 'mvn test'
-                   }
+                   
                }
             }
         }
@@ -44,9 +44,9 @@ pipeline {
         stage('4. Maven Build') {
             // Build the application into an executable file (.jar)
             steps{
-                dir ("DevOpsProject"){
+             
                   sh 'mvn clean install'   
-                }
+                
             }
         }
         
@@ -54,56 +54,54 @@ pipeline {
         
         stage('5.Maven Integration Test') {
             steps {
-                dir("DevOpsProject"){
+               
                     script{
                        sh 'mvn verify'   
                     }
-                }
+                
             }
         }
         
         
         stage('6.Docker Image Build') {
             steps {
-               dir("DevOpsProject"){
+               
                    script{
                       
                        def JOB = env.JOB_NAME.toLowerCase() // Convert Jenkins Job name to lower-case
-                       sh "docker build -t ${JOB}:${BUILD_NUMBER} ."  // 'JOB_NAME' & 'BUILD_NUMBER' are Jenkins Global variable
+                      sh "docker build -t ${JOB}:${BUILD_NUMBER} ."  // 'JOB_NAME' & 'BUILD_NUMBER' are Jenkins Global variable
                    }
-               }
+               
             }
         }
         
         stage('7.Docker Image Tag') {
             steps {
-               dir("DevOpsProject"){
+              
                    script{
                         def JOB = env.JOB_NAME.toLowerCase() // Convert Jenkins Job name to lower-case
                          sh "docker tag ${JOB}:${BUILD_NUMBER} ${DOCKER_USERNAME}/${JOB}:v${BUILD_NUMBER}"
                     sh "docker tag ${JOB}:${BUILD_NUMBER} ${DOCKER_USERNAME}/${JOB}:latest"
                    }
-               }
+               
             }
         }
         
         stage('8. Trivy Image Scan') {
             // Scan Docker images for vulnerabilities 
             steps {
-               dir("DevOpsProject")
-               {
+              
                    script{
                        def JOB = env.JOB_NAME.toLowerCase() // Convert Jenkins Job name to lower-case
                   sh "trivy image ${DOCKER_USERNAME}/${JOB}:v${BUILD_NUMBER} > scan.txt"
                    }
-               }
+               
             }
         }
         
         stage('9.Docker Image Push') {
             steps {
-                dir("DevOpsProject")
-                {
+                
                     script{
                         withCredentials([usernamePassword(credentialsId: 'my_dockerhub_creds', passwordVariable: 'my_docker_pass', usernameVariable: 'my_docker_user')]) {
                        sh "docker login -u '${my_docker_user}' -p '${my_docker_pass}'"
@@ -111,7 +109,7 @@ pipeline {
                     sh "docker push ${DOCKER_USERNAME}/${JOB}:v${BUILD_NUMBER}"
                     sh "docker push ${DOCKER_USERNAME}/${JOB}:latest"
                      }
-                    }
+                    
                 }
             }
         }

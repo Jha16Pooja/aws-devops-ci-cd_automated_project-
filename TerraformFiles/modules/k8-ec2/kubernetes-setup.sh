@@ -4,7 +4,7 @@
 sleep 200
 
 # Install Docker
-# REF: https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
+
 sudo yum update -y
 sudo yum install docker -y
 sudo systemctl start docker
@@ -51,3 +51,6 @@ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0
 
 # Remove taints to allow scheduling on control-plane node
 kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+
+
+
