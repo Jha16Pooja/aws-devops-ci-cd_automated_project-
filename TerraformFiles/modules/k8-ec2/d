@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Update and install necessary packages
+sudo yum update -y
+sudo yum install -y git
+
+# Install Docker
+sudo amazon-linux-extras install docker
+sudo service docker start
+sudo usermod -a -G docker ec2-user
+
+# Install kubeadm, kubelet, and kubectl
+cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+exclude=kubelet kubeadm kubectl
+EOF
+
+# Set SELinux in permissive mode
+sudo setenforce 0
+sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+
+sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+sudo systemctl enable --now kubelet
+
+# Initialize the Kubernetes cluster
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+
+# To start using your cluster, you need to run as a regular user
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+# Apply a CNI (Calico)
+kubectl apply -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml
+
+# Allow the master node to schedule pods
+kubectl taint nodes --all node-role.kubernetes.io/master-

@@ -1,0 +1,47 @@
+#Install DOCKER , MINIKUBE , KUBECTL In K8S SERVER
+#Create 3 diffrent files to install docker, minikube , k8s
+------------
+#Install Docker
+-----------
+sudo su -
+vi docker.bash
+#!/bin/bash
+sudo yum update -y sudo yum install docker -y 
+sudo systemctl start docker 
+sudo systemctl enable docker
+sudo usermod -aG docker $USER && newgrp docker
+
+chmod a+x docker.bash
+./docker.bash
+
+--------
+#Install MiniKube
+---------
+sudo su -
+vi minikube.bash
+#!/bin/bash
+sudo curl -Lo https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
+sudo rpm -Uh minikube-latest.x86_64.rpm
+sudo minikube start --force
+
+chmod a+x minikube.bash
+./minikube.bash
+
+---------
+# Install kubectl
+---------
+# REF: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+
+sudo su - 
+vi k8s.bash
+I
+#!/bin/bash
+curl -Lo "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+curl -LO https://dl.k8s.io/release/v1.29.1/bin/linux/amd64/kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+echo "$(cat kubecti.sha256) kubectl" | sha256sum --check
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl 
+sudo chmod +x kubectl 
+sudo mkdir -p ~/.local/bin 
+sudo mv •/kubectl ~/. local/bin/kubectl 
+kubectl version
